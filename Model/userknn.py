@@ -116,7 +116,6 @@ class UserKNN():
         self.items = None
         self.matrix = None
         self.evaluation_results = None
-        self.recommender_name = None
         self.extra_info_header = None
         self.predictions = []
 
@@ -402,7 +401,7 @@ class UserKNN():
         if self.output_file is not None:
             WriteFile(self.output_file, data=self.predictions, sep=self.sep).write()
 
-    def print_header(header_info, test_info=None):
+    def print_header(self, header_info, test_info=None):
         """
         Function to print the header with information of the files
 
@@ -442,8 +441,7 @@ class UserKNN():
 
         self.evaluation_results = {}
 
-        if metrics is None:
-            metrics = list(['MAE', 'RMSE'])
+        metrics = list(['MAE', 'RMSE'])
 
         results = self.evaluate_recommender(predictions=self.predictions,
                                                                     test_set=self.test_set)
@@ -567,6 +565,9 @@ class UserKNN():
             print(evaluation)
 
     def itemEvaluate(self, predictions, test_set):
+
+        self.metrics = list(['PREC', 'RECALL', 'MAP', 'NDCG'])
+        self.metrics = [m + '@' + str(n) for m in self.metrics for n in self.n_ranks]
         predictions_dict = {}
 
         for sample in predictions:

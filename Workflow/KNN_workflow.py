@@ -14,7 +14,7 @@ def run():
     CrossValidation(input_file=db, recommender=recommender, dir_folds=folds_path, header=1, k_folds=5).compute()
 
     # # Simple
-    UserKNN(tr, te).compute()
+    UserKNN(tr, te, verbose=True).compute()
 
     # # Cross Validation
     # recommender = ItemKNN()
