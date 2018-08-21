@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import time
 import os
-from DataProcess.SplitData import Split
-from Model.LFM import LFM
-from Evaluation.LFM_Evaluator import ModelRmse
+from ..DataProcess.SplitData import Split
+from ..Model.LFM import LFM
+from ..Evaluation.LFM_Evaluator import ModelRmse
 
 train=[]
 test=[]
