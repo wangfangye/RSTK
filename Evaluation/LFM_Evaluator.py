@@ -1,5 +1,6 @@
 import math
 
+# unused
 def ModelRmse(train,test,P,Q,bu,bi,mu):
     rmse = 0
     num = 0

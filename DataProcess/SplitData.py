@@ -1,12 +1,8 @@
 import pandas as pd
 import random
 
-class Split:
-
+class Split(object):
     # split data for training and testing
-
-
-
     def __init__(self):
         self.origin_path = 'Data/{}'
 
@@ -30,10 +26,10 @@ class Split:
         f.close()
 
         random.seed(seed)
-        for user,item,rating in data:
-            if random.randint(0,M)==k:
-                test.append((user,item,rating))
+        for user, item, rating in data:
+            if random.randint(0, M) == k:
+                test.append((user, item, rating))
             else:
-                train.append((user,item,rating))
+                train.append((user, item, rating))
 
-        return train,test
+        return train, test

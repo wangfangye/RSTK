@@ -1,3 +1,0 @@
-# RSTK
-
-CISL Recommander System
