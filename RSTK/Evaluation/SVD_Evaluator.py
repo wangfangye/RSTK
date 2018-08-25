@@ -1,87 +1,35 @@
 from collections import namedtuple
-from Model.SVD import SVD
-from Model.SVD import PredictionImpossible
+from ..Model import SVD
+import numpy as np
 
 
-class SVDPredict(SVD):
-    def __init__(self):
-        SVD.__init__(self)
+def rmse(predictions, verbose=True):
+    if not predictions:
+        raise ValueError('Prediction list is empty.')
 
-    def predict(self, uid, iid, r_ui=None, clip=True, verbose=False):
+    mse = np.mean([float((true_r - est) ** 2)
+                   for (_, _, true_r, est, _) in predictions])
+    rmse_ = np.sqrt(mse)
 
-        # Convert raw ids to inner ids
-        try:
-            iuid = self.trainset.to_inner_uid(uid)
-        except ValueError:
-            iuid = 'UKN__' + str(uid)
-        try:
-            iiid = self.trainset.to_inner_iid(iid)
-        except ValueError:
-            iiid = 'UKN__' + str(iid)
+    if verbose:
+        print('RMSE: {0:1.4f}'.format(rmse_))
 
-        details = {}
-        try:
-            est = self.estimate(iuid, iiid)
+    return rmse_
 
-            # If the details dict was also returned
-            if isinstance(est, tuple):
-                est, details = est
+class Prediction(namedtuple('Prediction',
+                            ['uid', 'iid', 'r_ui', 'est', 'details'])):
+    __slots__ = ()  # for memory saving purpose.
 
-            details['was_impossible'] = False
+    def __str__(self):
+        s = 'user: {uid:<10} '.format(uid=self.uid)
+        s += 'item: {iid:<10} '.format(iid=self.iid)
+        if self.r_ui is not None:
+            s += 'r_ui = {r_ui:1.2f}   '.format(r_ui=self.r_ui)
+        else:
+            s += 'r_ui = None   '
+        s += 'est = {est:1.2f}   '.format(est=self.est)
+        s += str(self.details)
 
-        except PredictionImpossible as e:
-            est = self.default_prediction()
-            details['was_impossible'] = True
-            details['reason'] = str(e)
+        return s
 
-        # clip estimate into [lower_bound, higher_bound]
-        if clip:
-            lower_bound, higher_bound = self.trainset.rating_scale
-            est = min(higher_bound, est)
-            est = max(lower_bound, est)
 
-        pred = Prediction(uid, iid, r_ui, est, details)
-
-        if verbose:
-            print(pred)
-
-        return pred
-
-    def default_prediction(self):
-        '''Used when the ``PredictionImpossible`` exception is raised during a
-        call to :meth:`predict()
-        <surprise.prediction_algorithms.algo_base.AlgoBase.predict>`. By
-        default, return the global mean of all ratings (can be overridden in
-        child classes).
-
-        Returns:
-            (float): The mean of all ratings in the trainset.
-        '''
-
-        return self.trainset.global_mean
-
-    def test(self, testset, verbose=False):
-        """Test the algorithm on given testset, i.e. estimate all the ratings
-        in the given testset.
-
-        Args:
-            testset: A test set, as returned by a :ref:`cross-validation
-                itertor<use_cross_validation_iterators>` or by the
-                :meth:`build_testset() <surprise.Trainset.build_testset>`
-                method.
-            verbose(bool): Whether to print details for each predictions.
-                Default is False.
-
-        Returns:
-            A list of :class:`Prediction\
-            <surprise.prediction_algorithms.predictions.Prediction>` objects
-            that contains all the estimated ratings.
-        """
-
-        # The ratings are translated back to their original scale.
-        predictions = [self.predict(uid,
-                                    iid,
-                                    r_ui_trans,
-                                    verbose=verbose)
-                       for (uid, iid, r_ui_trans) in testset]
-        return predictions
