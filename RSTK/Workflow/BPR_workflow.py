@@ -29,7 +29,7 @@ def load_train_value():
     return None
 
 def run():
-    path = "../Data/u.data"
+    path = "./Data/u.data"
     BPR_train(path)
     values = load_train_value()
     pre_user_favorite(values,5)

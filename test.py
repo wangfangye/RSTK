@@ -8,13 +8,13 @@ import sys
 
 def choose():
     arg = sys.argv[1]
-    if arg == 'lfm':
+    if arg == 'LFM':
         LFM()
-    elif arg == 'fm':
+    elif arg == 'FM':
         FM()
-    elif arg == 'bpr':
+    elif arg == 'BPR':
         BPR()
-    elif arg == 'knn':
+    elif arg == 'KNN':
         KNN()
     elif arg == 'SVD':
         SVD()
