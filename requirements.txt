@@ -1,0 +1,13 @@
+certifi==2018.8.24
+Cython==0.28.5
+joblib==0.12.2
+numpy==1.15.1
+pandas==0.23.4
+python-dateutil==2.7.3
+pytz==2018.5
+scikit-learn==0.19.2
+scikit-surprise==1.0.6
+scipy==1.1.0
+six==1.11.0
+sklearn==0.0
+wincertstore==0.2
