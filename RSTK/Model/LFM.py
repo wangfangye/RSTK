@@ -1,5 +1,8 @@
 import random
 import math
+from ..DataProcess.DataIO import DataIO
+from ..Evaluation.LFM_Evaluator import LFMEvaluator
+
 
 class LFM(object):
     def __init__(self, train_set=None, test_set=None, metrics=list(['MAE', 'RMSE']), nfactor=20, steps=10, learn_rate=0.02, reg=0.02):
@@ -21,14 +24,7 @@ class LFM(object):
         self.evaluation = None
 
     def train(self):
-        train = []
-        with open(self.train_file) as infile:
-            for line in infile:
-                if line.strip():
-                    inline = line.split('\t')
-                    if len(inline) == 1:
-                        raise TypeError("Error: Space type (sep) is invalid!")
-                    train.append((int(inline[0]), int(inline[1]), int(inline[2])))
+        train = DataIO(input_file=self.train_file).read()
         for u, i, rui in train:
             self.bu[u] = 0
             self.bi[i] = 0
@@ -52,29 +48,10 @@ class LFM(object):
                     self.Q[i][k] += self.learn_rate * (self.P[u][k]*(rui - pui) - self.reg*self.Q[i][k])
             self.learn_rate *= 0.9
 
-    def predict(self):
-        rmse = 0
-        mae=0
-        num = 0
+    def test(self):
         # print('Testing LFM.. ')
-        test = []
-        with open(self.test_file) as infile:
-            for line in infile:
-                if line.strip():
-                    inline = line.split('\t')
-                    if len(inline) == 1:
-                        raise TypeError("Error: Space type (sep) is invalid!")
-                    test.append((int(inline[0]), int(inline[1]), int(inline[2])))
-        for u, i, rui in test:
-            if ((u in self.P) and (i in self.Q)):
-                ret = self.mu + self.bu[u] + self.bi[i]
-                ret += sum(self.P[u][k] * self.Q[i][k] for k in range(0, len(self.P[u])))
-                pui = ret
-                rmse += (rui - pui) * (rui - pui)
-                mae += math.sqrt((rui - pui) * (rui - pui))
-                num += 1
-        rmse = math.sqrt(rmse / num)
-        mae = mae/num
+        test = DataIO(input_file=self.test_file).read()
+        rmse, mae = LFMEvaluator(test_set=test, p=self.P, q=self.Q, mu=self.mu, bi=self.bi, bu=self.bu).rating()
         print('RMSE: ', rmse)
         self.evaluation = {}
         self.evaluation.update({
@@ -85,6 +62,6 @@ class LFM(object):
         #     self.evaluation_results[metric.upper()] = results[metric.upper()]
         return rmse
 
-    def compute(self):
+    def run(self):
         self.train()
-        self.predict()
+        self.test()

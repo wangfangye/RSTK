@@ -1,5 +1,5 @@
 import sys
-from .DataProcess.TypeTransfer import Transfer
+from .DataProcess.DataTransfer import DataTransfer
 from .Workflow import LFM
 from .Workflow import BPR
 from .Workflow import FM
@@ -22,4 +22,3 @@ def choose():
 if __name__ == '__main__':
     # Transfer().process()
     choose()
-

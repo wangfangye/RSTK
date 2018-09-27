@@ -1,17 +1,28 @@
 import math
 
-# unused
-def ModelRmse(train,test,P,Q,bu,bi,mu):
-    rmse = 0
-    num = 0
-    for u,i,rui in test:
-        if ((u in P) and (i in Q)):
-            rmse += (rui - Predict(u,i,P,Q,bu,bi,mu)) * (rui - Predict(u,i,P,Q,bu,bi,mu))
-            num += 1
-    rmse = math.sqrt(rmse / num)
-    return rmse
 
-def Predict(u,i,P,Q,bu,bi,mu):
-    ret = mu + bu[u] + bi[i]
-    ret += sum( P[u][f] * Q[i][f] for f in range( 0,len(P[u]) ) )
-    return ret
+class LFMEvaluator(object):
+    def __init__(self, test_set=None, p=None, q=None, mu=0, bu=None, bi=None):
+        self.test_set = test_set
+        self.P = p
+        self.Q = q
+        self.bu = bu
+        self.bi = bi
+        self.mu = mu
+
+    def rating(self):
+        rmse = 0
+        mae = 0
+        num = 0
+        for u, i, rui in self.test_set:
+            if ((u in self.P) and (i in self.Q)):
+                ret = self.mu + self.bu[u] + self.bi[i]
+                ret += sum(self.P[u][k] * self.Q[i][k] for k in range(0, len(self.P[u])))
+                pui = ret
+                rmse += (rui - pui) * (rui - pui)
+                mae += math.sqrt((rui - pui) * (rui - pui))
+                num += 1
+        rmse = math.sqrt(rmse / num)
+        mae = mae/num
+        return rmse, mae
+
