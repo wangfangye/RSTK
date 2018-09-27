@@ -26,5 +26,3 @@ class LFMEvaluator(object):
         mae = mae/num
         return rmse, mae
 
-
-
